@@ -1,0 +1,63 @@
+.featureCard {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.featureCard.red {
+  border-left: 5px solid var(--ohio-red);
+}
+
+.featureCard.blue {
+  border-left: 5px solid var(--ohio-blue);
+}
+
+.featureCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.iconBox {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--ohio-blue), var(--ohio-red));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: white;
+}
+
+.featureCard h3 {
+  color: var(--ohio-blue);
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.featureCard p {
+  margin: 0;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .featureCard {
+    padding: 1.5rem;
+  }
+
+  .content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

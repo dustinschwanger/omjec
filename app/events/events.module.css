@@ -1,0 +1,273 @@
+/* Event Types Section */
+.eventTypesSection {
+  padding: 80px 0;
+}
+
+.sectionTitle {
+  text-align: center;
+  color: var(--ohio-blue);
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.sectionSubtitle {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 1.125rem;
+  margin-bottom: 3rem;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Upcoming Events Section */
+.upcomingSection {
+  padding: 80px 0;
+  background-color: var(--bg-light);
+}
+
+.upcomingCard {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.upcomingCard > i {
+  font-size: 4rem;
+  color: var(--ohio-blue);
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.upcomingCard h3 {
+  color: var(--ohio-blue);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.upcomingText {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  line-height: 1.8;
+  color: var(--text-light);
+}
+
+.appointmentBox {
+  background: var(--bg-light);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.appointmentBox h4 {
+  color: var(--ohio-red);
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.appointmentBox h4 i {
+  margin-right: 0.5rem;
+}
+
+.appointmentBox p {
+  margin-bottom: 1rem;
+}
+
+.appointmentBox p:last-of-type {
+  margin-bottom: 0;
+}
+
+.phoneNumber {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ohio-blue);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Preparing for Events Section */
+.prepSection {
+  padding: 80px 0;
+}
+
+.prepGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.prepCard {
+  background: linear-gradient(135deg, var(--ohio-blue), var(--ohio-red));
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.prepCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.prepCard i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.prepCard h3 {
+  color: white;
+  margin-bottom: 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.prepCard p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+/* Social Section */
+.socialSection {
+  padding: 80px 0;
+  background-color: var(--bg-light);
+}
+
+.socialContent {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.socialText {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  color: var(--text-light);
+}
+
+.socialCards {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.socialCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.socialCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.socialCard i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.socialCard i.fa-facebook {
+  color: #1877F2;
+}
+
+.socialCard i.fa-instagram {
+  color: #E4405F;
+}
+
+.socialCard h3 {
+  color: var(--ohio-blue);
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.socialCard p {
+  margin: 0;
+  color: var(--text-light);
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .servicesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .prepGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .eventTypesSection,
+  .upcomingSection,
+  .prepSection,
+  .socialSection {
+    padding: 60px 0;
+  }
+
+  .servicesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .upcomingCard {
+    padding: 2rem;
+  }
+
+  .upcomingCard > i {
+    font-size: 3rem;
+  }
+
+  .prepGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .socialCards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .socialCard {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buttonGroup a {
+    width: 100%;
+  }
+}

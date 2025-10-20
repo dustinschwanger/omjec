@@ -1,0 +1,39 @@
+.serviceCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.serviceCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.serviceIcon {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ohio-blue), var(--ohio-red));
+  color: white;
+  border-radius: 50%;
+  font-size: 1.75rem;
+}
+
+.serviceCard h3 {
+  color: var(--ohio-blue);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.serviceCard p {
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.6;
+}

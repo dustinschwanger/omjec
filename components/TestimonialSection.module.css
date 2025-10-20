@@ -1,0 +1,51 @@
+.faqSection {
+  padding: 80px 0;
+  background-color: var(--bg-light);
+}
+
+.sectionTitle {
+  text-align: center;
+  color: var(--ohio-blue);
+  margin-bottom: 3rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.testimonialCard {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  background: white;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.testimonialQuote {
+  font-size: 1.25rem;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  color: var(--text-dark);
+}
+
+.testimonialAuthor {
+  font-weight: 600;
+  color: var(--ohio-blue);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .faqSection {
+    padding: 60px 0;
+  }
+
+  .testimonialCard {
+    padding: 2rem;
+  }
+
+  .testimonialQuote {
+    font-size: 1.125rem;
+  }
+}

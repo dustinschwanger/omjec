@@ -1,0 +1,45 @@
+.mission {
+  background-color: var(--bg-light);
+  padding: 60px 0;
+}
+
+.missionContent {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.missionIcon {
+  font-size: 3rem;
+  color: var(--ohio-red);
+  flex-shrink: 0;
+}
+
+.missionText {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mission {
+    padding: 40px 0;
+  }
+
+  .missionContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .missionIcon {
+    font-size: 2.5rem;
+  }
+
+  .missionText {
+    font-size: 1rem;
+  }
+}
