@@ -1,5 +1,4 @@
 import PageHero from '@/components/PageHero'
-import ServiceCard from '@/components/ServiceCard'
 import ContactForm from './ContactForm'
 import styles from './contact.module.css'
 
@@ -23,11 +22,14 @@ export default function ContactPage() {
           <p className={styles.sectionSubtitle}>Stop by during our office hours or call to schedule an appointment</p>
 
           <div className={styles.contactGrid}>
-            <ServiceCard
-              icon="fas fa-map-marker-alt"
-              title="Address"
-              description="221 W. Parish St.<br/>Sandusky, OH 44870"
-            />
+            <div className="service-card">
+              <div className="service-icon">
+                <i className="fas fa-map-marker-alt"></i>
+              </div>
+              <h3>Address</h3>
+              <p>221 W. Parish St.</p>
+              <p>Sandusky, OH 44870</p>
+            </div>
 
             <div className="service-card">
               <div className="service-icon">
@@ -38,17 +40,22 @@ export default function ContactPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}><strong>Appointments:</strong> 419-624-6459</p>
             </div>
 
-            <ServiceCard
-              icon="fas fa-envelope"
-              title="Email"
-              description='<a href="mailto:OMJ-ErieCo@jfs.ohio.gov">OMJ-ErieCo@jfs.ohio.gov</a>'
-            />
+            <div className="service-card">
+              <div className="service-icon">
+                <i className="fas fa-envelope"></i>
+              </div>
+              <h3>Email</h3>
+              <p><a href="mailto:OMJ-ErieCo@jfs.ohio.gov">OMJ-ErieCo@jfs.ohio.gov</a></p>
+            </div>
 
-            <ServiceCard
-              icon="fas fa-clock"
-              title="Hours"
-              description="Monday - Friday<br/>8:30 AM - 4:00 PM"
-            />
+            <div className="service-card">
+              <div className="service-icon">
+                <i className="fas fa-clock"></i>
+              </div>
+              <h3>Hours</h3>
+              <p>Monday - Friday</p>
+              <p>8:30 AM - 4:00 PM</p>
+            </div>
           </div>
         </div>
       </section>
