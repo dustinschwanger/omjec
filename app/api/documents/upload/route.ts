@@ -3,6 +3,7 @@ import { createServerSupabaseClientFromCookies } from '@/lib/supabase-auth'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { v4 as uuidv4 } from 'uuid'
+import { processDocument, type DocumentToProcess } from '@/lib/document-processor'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -191,12 +192,23 @@ export async function POST(request: NextRequest) {
 
     // Trigger background processing (fire and forget)
     // We don't await this to avoid blocking the upload response
-    fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/api/documents/process/${document.id}`, {
-      method: 'POST',
-    }).catch((error) => {
-      console.error('Failed to trigger document processing:', error)
-      // Processing can be triggered manually from admin dashboard if this fails
-    })
+    const documentToProcess: DocumentToProcess = {
+      id: document.id,
+      title: document.title,
+      filename: document.filename,
+      type: document.type,
+      storage_path: document.storage_path,
+      public_url: document.public_url,
+      is_downloadable: document.is_downloadable || false,
+      metadata: document.metadata,
+    }
+
+    // Process in background without blocking response
+    Promise.resolve().then(() => processDocument(documentToProcess))
+      .catch((error) => {
+        console.error('Failed to trigger document processing:', error)
+        // Processing can be triggered manually from admin dashboard if this fails
+      })
 
     return NextResponse.json({
       success: true,
