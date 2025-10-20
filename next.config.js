@@ -26,6 +26,10 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
+
+  // External packages for server components (don't bundle these)
+  // pdf-parse and canvas have native dependencies that break when bundled
+  serverExternalPackages: ['pdf-parse', 'canvas'],
 };
 
 module.exports = nextConfig;
