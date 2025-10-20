@@ -1,17 +1,33 @@
+import 'server-only'
 import { createWorker } from 'tesseract.js'
 import mammoth from 'mammoth'
 
 /**
  * Extract text from PDF files
+ * Uses dynamic import to avoid bundling/minification issues in production
  */
-export async function extractFromPDF(buffer: Buffer): Promise<string> {
+export async function extractFromPDF(input: Buffer | ArrayBuffer | Uint8Array): Promise<string> {
   try {
-    // Use the Node.js-specific export from pdf-parse
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pdf = require('pdf-parse/node')
-    // Convert Buffer to Uint8Array for compatibility
-    const data = await pdf(new Uint8Array(buffer))
-    return data.text.trim()
+    // 1) Pull the Node ESM build explicitly to avoid interop/bundling issues
+    const pdfParse = await import('pdf-parse/node')
+    // Get the actual function - could be default or named export
+    const pdf = (pdfParse as any).default || pdfParse
+
+    // 2) Normalize to Uint8Array (pdf-parse expects typed array)
+    let uint8: Uint8Array
+    if (input instanceof Uint8Array) {
+      uint8 = input
+    } else if (input instanceof ArrayBuffer) {
+      uint8 = new Uint8Array(input)
+    } else {
+      // Buffer type - TypeScript can't narrow this, so we cast
+      const buf = input as Buffer
+      uint8 = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength)
+    }
+
+    // 3) Call the pdf parse function
+    const { text } = await pdf(uint8)
+    return text.trim()
   } catch (error) {
     console.error('Error extracting text from PDF:', error)
     throw new Error(`PDF extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
