@@ -6,10 +6,11 @@ import mammoth from 'mammoth'
  */
 export async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Use require for pdf-parse to avoid ESM/CommonJS issues in production
+    // Use the Node.js-specific export from pdf-parse
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const pdfParse = require('pdf-parse')
-    const data = await pdfParse(buffer)
+    const pdf = require('pdf-parse/node')
+    // Convert Buffer to Uint8Array for compatibility
+    const data = await pdf(new Uint8Array(buffer))
     return data.text.trim()
   } catch (error) {
     console.error('Error extracting text from PDF:', error)
