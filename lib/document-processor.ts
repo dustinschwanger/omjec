@@ -225,7 +225,7 @@ async function generateAndStoreEmbeddings(
             chunk_index: chunk.chunkIndex,
             total_chunks: chunk.metadata.totalChunks || 0,
             is_downloadable: document.is_downloadable,
-            download_url: downloadUrl,
+            ...(downloadUrl ? { download_url: downloadUrl } : {}),
             content_preview: chunk.content.slice(0, 200),
           },
         },

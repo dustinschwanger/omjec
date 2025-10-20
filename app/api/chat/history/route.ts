@@ -37,12 +37,17 @@ export async function GET(req: NextRequest) {
       }
 
       session = newSession
-      console.log('New session created:', session.id)
+      console.log('New session created:', session?.id)
     } else if (sessionError) {
       console.error('Session lookup error:', sessionError)
       return NextResponse.json({ error: `Session error: ${sessionError.message}` }, { status: 500 })
-    } else {
+    } else if (session) {
       console.log('Chat history - Session found:', session.id)
+    }
+
+    // Ensure session exists
+    if (!session) {
+      return NextResponse.json({ error: 'Failed to get or create session' }, { status: 500 })
     }
 
     // Get messages

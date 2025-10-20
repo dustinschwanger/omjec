@@ -1,13 +1,20 @@
-import pdfParse from 'pdf-parse'
 import { createWorker } from 'tesseract.js'
 import mammoth from 'mammoth'
+
+// Dynamic import for pdf-parse (handles both CommonJS and ESM)
+async function getPdfParser(): Promise<any> {
+  const pdfModule = await import('pdf-parse')
+  // Handle both CommonJS (pdfModule.default) and ESM (pdfModule directly)
+  return 'default' in pdfModule ? (pdfModule as any).default : pdfModule
+}
 
 /**
  * Extract text from PDF files
  */
 export async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const data = await pdfParse(buffer)
+    const parser = await getPdfParser()
+    const data = await parser(buffer)
     return data.text.trim()
   } catch (error) {
     console.error('Error extracting text from PDF:', error)

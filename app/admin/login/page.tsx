@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import styles from './login.module.css'
 
 export default function AdminLogin() {
@@ -109,10 +110,10 @@ export default function AdminLogin() {
         </form>
 
         <div className={styles.footer}>
-          <a href="/">
+          <Link href="/">
             <i className="fas fa-arrow-left"></i>
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

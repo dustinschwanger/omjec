@@ -231,10 +231,10 @@ export default function AdminDashboard() {
             <h1>Dashboard</h1>
             <p>Manage documents and monitor chat activity</p>
           </div>
-          <a href="/" className={styles.viewSiteLink}>
+          <Link href="/" className={styles.viewSiteLink}>
             <i className="fas fa-external-link-alt"></i>
             View Site
-          </a>
+          </Link>
         </header>
 
         <div className={styles.stats}>
