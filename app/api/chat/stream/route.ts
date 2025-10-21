@@ -268,7 +268,8 @@ async function getRelevantContext(
       // Use download API URL for tracking (prefer metadata, fallback to generating)
       let downloadUrl = metadata?.download_url
       if (isDownloadable && !downloadUrl && chunk.document_id) {
-        downloadUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/api/documents/download/${chunk.document_id}`
+        const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '')
+        downloadUrl = `${baseUrl}/api/documents/download/${chunk.document_id}`
       }
 
       // Build context string

@@ -197,9 +197,10 @@ async function generateAndStoreEmbeddings(
   const index = pinecone.index(process.env.PINECONE_INDEX_NAME!)
   const embeddingIds: string[] = []
 
-  // Generate download API URL
+  // Generate download API URL (strip trailing slash from base URL)
+  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '')
   const downloadUrl = document.is_downloadable
-    ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/api/documents/download/${document.id}`
+    ? `${baseUrl}/api/documents/download/${document.id}`
     : undefined
 
   // Process chunks in batches to avoid rate limits
