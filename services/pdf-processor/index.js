@@ -1,9 +1,9 @@
-import express from 'express'
-import cors from 'cors'
-import multer from 'multer'
-import pdf from 'pdf-parse'
-import { createWorker } from 'tesseract.js'
-import mammoth from 'mammoth'
+const express = require('express')
+const cors = require('cors')
+const multer = require('multer')
+const pdf = require('pdf-parse')
+const { createWorker } = require('tesseract.js')
+const mammoth = require('mammoth')
 
 const app = express()
 const upload = multer({ storage: multer.memoryStorage() })
