@@ -1,33 +1,32 @@
 import 'server-only'
-import { createWorker } from 'tesseract.js'
-import mammoth from 'mammoth'
 
 /**
- * Extract text from PDF files
- * Uses dynamic import to avoid bundling/minification issues in production
+ * Extract text from PDF files using external microservice
+ * This avoids Next.js bundling/minification issues with pdf-parse
  */
-export async function extractFromPDF(input: Buffer | ArrayBuffer | Uint8Array): Promise<string> {
+export async function extractFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // 1) Pull the Node ESM build explicitly to avoid interop/bundling issues
-    const pdfParse = await import('pdf-parse/node')
-    // Get the actual function - could be default or named export
-    const pdf = (pdfParse as any).default || pdfParse
+    const pdfProcessorUrl = process.env.PDF_PROCESSOR_URL || 'http://localhost:3002'
 
-    // 2) Normalize to Uint8Array (pdf-parse expects typed array)
-    let uint8: Uint8Array
-    if (input instanceof Uint8Array) {
-      uint8 = input
-    } else if (input instanceof ArrayBuffer) {
-      uint8 = new Uint8Array(input)
-    } else {
-      // Buffer type - TypeScript can't narrow this, so we cast
-      const buf = input as Buffer
-      uint8 = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength)
+    // Create FormData with the PDF buffer
+    const formData = new FormData()
+    // Create a proper ArrayBuffer from the Node.js Buffer
+    const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' })
+    formData.append('file', blob, 'document.pdf')
+
+    const response = await fetch(`${pdfProcessorUrl}/extract/pdf`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'PDF processing service error')
     }
 
-    // 3) Call the pdf parse function
-    const { text } = await pdf(uint8)
-    return text.trim()
+    const result = await response.json()
+    return result.text
   } catch (error) {
     console.error('Error extracting text from PDF:', error)
     throw new Error(`PDF extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -35,29 +34,59 @@ export async function extractFromPDF(input: Buffer | ArrayBuffer | Uint8Array): 
 }
 
 /**
- * Extract text from images using OCR (Tesseract.js)
+ * Extract text from images using OCR via external microservice
  */
 export async function extractFromImage(buffer: Buffer): Promise<string> {
-  const worker = await createWorker('eng')
-
   try {
-    const { data: { text } } = await worker.recognize(buffer)
-    await worker.terminate()
-    return text.trim()
+    const pdfProcessorUrl = process.env.PDF_PROCESSOR_URL || 'http://localhost:3002'
+
+    const formData = new FormData()
+    const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+    const blob = new Blob([arrayBuffer], { type: 'image/jpeg' })
+    formData.append('file', blob, 'image.jpg')
+
+    const response = await fetch(`${pdfProcessorUrl}/extract/image`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Image processing service error')
+    }
+
+    const result = await response.json()
+    return result.text
   } catch (error) {
-    await worker.terminate()
     console.error('Error extracting text from image:', error)
     throw new Error(`Image OCR failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
 /**
- * Extract text from Word documents (.docx)
+ * Extract text from Word documents (.docx) via external microservice
  */
 export async function extractFromWord(buffer: Buffer): Promise<string> {
   try {
-    const result = await mammoth.extractRawText({ buffer })
-    return result.value.trim()
+    const pdfProcessorUrl = process.env.PDF_PROCESSOR_URL || 'http://localhost:3002'
+
+    const formData = new FormData()
+    const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer
+    const blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+    formData.append('file', blob, 'document.docx')
+
+    const response = await fetch(`${pdfProcessorUrl}/extract/word`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Word processing service error')
+    }
+
+    const result = await response.json()
+    return result.text
   } catch (error) {
     console.error('Error extracting text from Word document:', error)
     throw new Error(`Word extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
