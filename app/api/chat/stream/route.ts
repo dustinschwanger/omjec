@@ -241,16 +241,16 @@ async function getRelevantContext(
       return { context: null, chunkCount: 0 }
     }
 
-    // Get the embedding IDs from Pinecone results
-    const embeddingIds = queryResponse.matches.map((match) => match.id)
+    // Create a map of embedding_id to Pinecone match for proper metadata lookup
+    const matchMap = new Map(queryResponse.matches.map((match) => [match.id, match]))
 
     const supabaseAdmin = getSupabaseAdmin()
 
     // Fetch the actual content from Supabase
     const { data: chunks } = await supabaseAdmin
       .from('document_chunks')
-      .select('content, document_id, documents(title, is_downloadable, public_url)')
-      .in('embedding_id', embeddingIds)
+      .select('content, document_id, embedding_id, documents(title, is_downloadable, public_url)')
+      .in('embedding_id', Array.from(matchMap.keys()))
 
     if (!chunks || chunks.length === 0) {
       return { context: null, chunkCount: 0 }
@@ -259,18 +259,22 @@ async function getRelevantContext(
     // Format context with download information
     const contextParts: string[] = []
 
-    chunks.forEach((chunk: any, index: number) => {
-      const match = queryResponse.matches[index]
-      const score = match?.score || 0
+    chunks.forEach((chunk: any) => {
+      // Get the corresponding Pinecone match using embedding_id
+      const match = matchMap.get(chunk.embedding_id)
+      if (!match) return
 
+      const score = match.score || 0
       if (score < 0.7) return // Filter low relevance
 
-      const metadata = match?.metadata
+      const metadata = match.metadata
       const isDownloadable = chunk.documents?.is_downloadable || metadata?.is_downloadable
       const title = chunk.documents?.title || metadata?.document_title || 'Document'
 
-      // Use download API URL for tracking (prefer metadata, fallback to generating)
+      // Use download URL from Pinecone metadata (this is the correct, actual URL)
       let downloadUrl = metadata?.download_url
+
+      // Only generate fallback URL if Pinecone doesn't have it
       if (isDownloadable && !downloadUrl && chunk.document_id) {
         const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '')
         downloadUrl = `${baseUrl}/api/documents/download/${chunk.document_id}`
