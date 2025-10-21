@@ -45,6 +45,11 @@ Office Information:
 - Email: OMJ-ErieCo@jfs.ohio.gov
 - Hours: Monday-Friday, 8:30 AM - 4:00 PM
 
+**Answering Questions:**
+- For general questions about services, programs, or information: Answer using your knowledge and the information above
+- If you receive document context below (marked with "📄 DOWNLOADABLE"), use it to provide specific details
+- For questions about specific documents/forms: ONLY provide download links if they appear in the context below
+
 **CRITICAL - Downloadable Documents:**
 When you have access to downloadable documents in the context (marked with "📄 DOWNLOADABLE: [URL]"):
 1. YOU MUST copy the EXACT FULL URL that appears after "📄 DOWNLOADABLE:" in the context
@@ -54,12 +59,9 @@ When you have access to downloadable documents in the context (marked with "📄
 5. If no URL is provided in the context, do NOT include a download link
 6. Proactively mention downloadable documents when relevant
 
-
 When suggesting downloads:
 - Be specific about what the document contains
-- Explain when/how they should use it
-
-Answer based on the provided context. If the context doesn't contain the answer, use your knowledge but mention that users can contact the office for the most up-to-date information.`
+- Explain when/how they should use it`
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now() // Track response time for analytics
@@ -127,19 +129,27 @@ export async function POST(req: NextRequest) {
     // Log debug info
     log('RAG Debug Info:', debug)
 
-    // Fail fast if no context - don't let AI hallucinate
+    // Check if user is asking for documents/downloads specifically
+    const isDocumentRequest = /\b(download|document|form|pdf|file)\b/i.test(message)
+
+    // Fail fast ONLY if user is asking for documents but we have none
+    // For general questions, let the AI answer from system prompt knowledge
     if (!context || chunkCount === 0) {
-      log('❌ No context retrieved, failing fast to prevent hallucination')
-      return new Response(
-        JSON.stringify({
-          error: 'No relevant documents found for your query. Please try rephrasing or contact the office directly.',
-          debug: debug
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      )
+      if (isDocumentRequest) {
+        log('❌ No documents found for document request, failing fast')
+        return new Response(
+          JSON.stringify({
+            error: 'No relevant documents found for your query. Please try rephrasing or contact the office directly.',
+            debug: debug
+          }),
+          {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        )
+      } else {
+        log('ℹ️ No RAG context but general question - allowing AI to answer from system knowledge')
+      }
     }
 
     // Get recent conversation history (limit to 8 turns to prevent token overflow)
