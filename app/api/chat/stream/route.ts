@@ -8,6 +8,27 @@ import { formatAnalyticsData } from '@/lib/chat-analytics'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+// Safe logger that won't crash on circular structures
+const log = (...args: any[]) => {
+  try {
+    console.log('[CHAT]', ...args)
+  } catch (e) {
+    console.log('[CHAT] Log error:', String(e))
+  }
+}
+
+// Type for Supabase chunk rows with join
+type ChunkRow = {
+  content: string
+  document_id: string
+  embedding_id: string
+  documents?: {
+    title?: string | null
+    is_downloadable?: boolean | null
+    public_url?: string | null
+  } | null
+}
+
 const SYSTEM_PROMPT = `You are a helpful assistant for OhioMeansJobs Erie County. You help users with:
 - Job seeker services (resume writing, interview prep, job search assistance)
 - Employer services (job posting, recruitment, training grants)
@@ -100,16 +121,34 @@ export async function POST(req: NextRequest) {
     })
 
     // Get relevant context from Pinecone using RAG
-    const { context, chunkCount } = await getRelevantContext(message)
+    const { context, chunkCount, debug } = await getRelevantContext(message)
     chunksUsed = chunkCount
 
-    // Get recent conversation history
+    // Log debug info
+    log('RAG Debug Info:', debug)
+
+    // Fail fast if no context - don't let AI hallucinate
+    if (!context || chunkCount === 0) {
+      log('❌ No context retrieved, failing fast to prevent hallucination')
+      return new Response(
+        JSON.stringify({
+          error: 'No relevant documents found for your query. Please try rephrasing or contact the office directly.',
+          debug: debug
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    // Get recent conversation history (limit to 8 turns to prevent token overflow)
     const { data: recentMessages } = await supabaseAdmin
       .from('chat_messages')
       .select('role, content')
       .eq('session_id', session.id)
       .order('created_at', { ascending: false })
-      .limit(10)
+      .limit(8)
 
     const conversationHistory = (recentMessages || [])
       .reverse()
@@ -117,6 +156,8 @@ export async function POST(req: NextRequest) {
         role: msg.role as 'user' | 'assistant',
         content: msg.content,
       }))
+
+    log('Conversation history length:', conversationHistory.length)
 
     // Create streaming response
     const encoder = new TextEncoder()
@@ -138,6 +179,15 @@ export async function POST(req: NextRequest) {
               : []),
             ...conversationHistory,
           ]
+
+          // Log what we're sending to OpenAI
+          log('Sending to OpenAI:', {
+            messageCount: messages.length,
+            hasSystemPrompt: messages[0].role === 'system',
+            hasContext: messages.length > 1 && messages[1].role === 'system',
+            contextPreview: context?.slice(0, 200) + '...',
+            historyLength: conversationHistory.length
+          })
 
           // Stream from OpenAI
           const chatStream = await getChatCompletionStream(messages as any)
@@ -216,14 +266,31 @@ export async function POST(req: NextRequest) {
 
 async function getRelevantContext(
   query: string
-): Promise<{ context: string | null; chunkCount: number }> {
-  try {
-    // Generate embedding for the query
-    const queryEmbedding = await generateEmbedding(query)
+): Promise<{ context: string | null; chunkCount: number; debug: Record<string, any> }> {
+  const debug: Record<string, any> = { phase: 'start', query }
 
-    // Query Pinecone for relevant document chunks
+  try {
+    // Log runtime type
+    const runtimeType = (globalThis as any)?.EdgeRuntime ? 'edge' : 'node'
+    debug.runtime = runtimeType
+    log('Runtime type:', runtimeType)
+
+    if (runtimeType === 'edge') {
+      log('⚠️ WARNING: Running on Edge runtime, should be Node!')
+    }
+
+    // 1) Generate embedding
+    debug.phase = 'embedding'
+    const queryEmbedding = await generateEmbedding(query)
+    debug.embeddingDim = queryEmbedding.length
+    log('Embedding dimension:', queryEmbedding.length)
+
+    // 2) Query Pinecone
+    debug.phase = 'pinecone_query'
     const pinecone = await getPineconeClient()
-    const index = pinecone.index(process.env.PINECONE_INDEX_NAME!)
+    const indexName = process.env.PINECONE_INDEX_NAME!
+    const index = pinecone.index(indexName)
+    debug.indexName = indexName
 
     const queryResponse = await index.query({
       vector: queryEmbedding,
@@ -231,86 +298,123 @@ async function getRelevantContext(
       includeMetadata: true,
     })
 
+    debug.pineconeTopK = queryResponse.matches?.length ?? 0
+    debug.pineconeIds = queryResponse.matches?.map((m) => m.id) ?? []
+    log('Pinecone returned', debug.pineconeTopK, 'matches')
+    log('Pinecone IDs:', debug.pineconeIds)
+
     if (!queryResponse.matches || queryResponse.matches.length === 0) {
-      return { context: null, chunkCount: 0 }
+      log('❌ No Pinecone matches found')
+      return { context: null, chunkCount: 0, debug }
     }
 
-    // Create a map of embedding_id to Pinecone match for proper metadata lookup
-    const matchMap = new Map(queryResponse.matches.map((match) => [match.id, match]))
+    // 3) Map Pinecone results
+    debug.phase = 'mapping'
+    const keys = queryResponse.matches.map((m) => m.id)
+    const matchMap = new Map(queryResponse.matches.map((m) => [m.id, m]))
+    log('Created match map with', matchMap.size, 'entries')
 
+    // 4) Fetch from Supabase
+    debug.phase = 'supabase_fetch'
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Fetch the actual content from Supabase
-    const { data: chunks } = await supabaseAdmin
+    const { data: chunks, error: supabaseError } = await supabaseAdmin
       .from('document_chunks')
       .select('content, document_id, embedding_id, documents(title, is_downloadable, public_url)')
-      .in('embedding_id', Array.from(matchMap.keys()))
+      .in('embedding_id', keys as string[])
 
-    if (!chunks || chunks.length === 0) {
-      return { context: null, chunkCount: 0 }
+    if (supabaseError) {
+      debug.supabaseError = String(supabaseError.message || supabaseError)
+      log('❌ Supabase error:', debug.supabaseError)
+      return { context: null, chunkCount: 0, debug }
     }
 
-    // Format context with download information
+    debug.supabaseRows = chunks?.length ?? 0
+    log('Supabase returned', debug.supabaseRows, 'rows')
+
+    // Diagnostic: Which Pinecone IDs didn't resolve in Supabase?
+    const foundSet = new Set((chunks ?? []).map((c: any) => c.embedding_id))
+    debug.unmatchedIds = keys.filter((k) => !foundSet.has(k))
+
+    if (debug.unmatchedIds.length > 0) {
+      log('⚠️ Unmatched IDs (in Pinecone but not Supabase):', debug.unmatchedIds)
+      log('This suggests ID format mismatch between Pinecone and Supabase')
+    }
+
+    if (!chunks || chunks.length === 0) {
+      log('❌ No chunks returned from Supabase')
+      return { context: null, chunkCount: 0, debug }
+    }
+
+    // 5) Build context
+    debug.phase = 'build_context'
     const contextParts: string[] = []
 
-    chunks.forEach((chunk: any) => {
-      // Get the corresponding Pinecone match using embedding_id
+    for (const chunk of (chunks as ChunkRow[] | null) ?? []) {
       const match = matchMap.get(chunk.embedding_id)
-      if (!match) return
-
-      const score = match.score || 0
-      if (score < 0.7) return // Filter low relevance
-
-      const metadata = match.metadata
-      const isDownloadable = chunk.documents?.is_downloadable || metadata?.is_downloadable
-      const title = chunk.documents?.title || metadata?.document_title || 'Document'
-
-      // Debug logging
-      console.log('DEBUG - Processing chunk:', {
-        embedding_id: chunk.embedding_id,
-        document_id: chunk.document_id,
-        metadata_download_url: metadata?.download_url,
-        metadata_keys: metadata ? Object.keys(metadata) : [],
-        isDownloadable,
-        title
-      })
-
-      // Use download URL from Pinecone metadata (this is the correct, actual URL)
-      let downloadUrl = metadata?.download_url
-
-      // Only generate fallback URL if Pinecone doesn't have it
-      if (isDownloadable && !downloadUrl && chunk.document_id) {
-        const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '')
-        downloadUrl = `${baseUrl}/api/documents/download/${chunk.document_id}`
-        console.log('DEBUG - Generated fallback URL:', downloadUrl)
+      if (!match) {
+        log('⚠️ Chunk not in match map:', chunk.embedding_id)
+        continue
       }
 
-      console.log('DEBUG - Final downloadUrl:', downloadUrl)
+      const score = match.score || 0
+      if (score < 0.7) {
+        log('Filtered out low relevance chunk:', chunk.embedding_id, 'score:', score)
+        continue
+      }
 
-      // Build context string
+      const meta: any = match.metadata || {}
+      const downloadUrl = meta.download_url as string | undefined
+
+      // Use explicit fallbacks to avoid undefined
+      const title = chunk.documents?.title ?? meta.document_title ?? 'Untitled Document'
+      const isDownloadable = Boolean(chunk.documents?.is_downloadable ?? meta.is_downloadable)
+
+      log('Processing chunk:', {
+        embedding_id: chunk.embedding_id,
+        document_id: chunk.document_id,
+        title,
+        isDownloadable,
+        downloadUrl,
+        score
+      })
+
       let contextStr = `[${title}]`
-
       if (isDownloadable && downloadUrl) {
         contextStr += ` 📄 DOWNLOADABLE: ${downloadUrl}`
       }
-
       contextStr += `\n${chunk.content}`
 
       contextParts.push(contextStr)
-    })
+    }
+
+    debug.contextCount = contextParts.length
+    debug.sampleContextHead = contextParts[0]?.slice(0, 160)
+
+    log('Built', contextParts.length, 'context parts')
+    log('Sample context head:', debug.sampleContextHead)
+
+    if (contextParts.length === 0) {
+      log('❌ Built zero context parts - check ID format or join')
+      return { context: null, chunkCount: 0, debug }
+    }
 
     const context = contextParts.join('\n\n---\n\n')
+    debug.phase = 'complete'
 
-    // Debug: Log the final context to verify URLs are complete
-    console.log('DEBUG - Final context being sent to AI:')
-    console.log(context)
+    log('✅ Context built successfully, length:', context.length)
 
     return {
       context: context || null,
       chunkCount: contextParts.length,
+      debug,
     }
   } catch (error) {
-    console.error('Error getting context:', error)
-    return { context: null, chunkCount: 0 }
+    debug.phase = 'error'
+    debug.error = error instanceof Error ? error.message : String(error)
+    debug.stack = error instanceof Error ? error.stack : undefined
+    log('❌ Error in getRelevantContext:', debug.error)
+    log('Stack:', debug.stack)
+    return { context: null, chunkCount: 0, debug }
   }
 }
