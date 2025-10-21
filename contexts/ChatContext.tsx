@@ -24,6 +24,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const initializeSession = async () => {
     // Check for existing session in localStorage
     let token = localStorage.getItem('chat_session_token')
+    const hasVisitedBefore = localStorage.getItem('chat_has_visited')
 
     if (!token) {
       // Generate new session token
@@ -35,6 +36,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
 
     setSessionToken(token)
+
+    // Auto-open chat on first visit
+    if (!hasVisitedBefore) {
+      setIsOpen(true)
+      localStorage.setItem('chat_has_visited', 'true')
+    }
 
     // Note: The session will be created in the database by the API routes
     // when the first message is sent or history is loaded
