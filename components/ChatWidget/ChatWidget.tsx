@@ -22,9 +22,10 @@ export default function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+  // Auto-scroll disabled - users can manually scroll to see responses
+  // useEffect(() => {
+  //   scrollToBottom()
+  // }, [messages])
 
   useEffect(() => {
     // Load chat history when widget opens
