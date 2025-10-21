@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClientFromCookies } from '@/lib/supabase-auth'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { deleteDocumentEmbeddings } from '@/lib/document-processor'
 
 export async function DELETE(
   request: NextRequest,
@@ -74,6 +75,10 @@ export async function DELETE(
         { status: 404 }
       )
     }
+
+    // Delete embeddings from Pinecone first
+    console.log(`Deleting embeddings from Pinecone for document: ${id}`)
+    await deleteDocumentEmbeddings(id)
 
     // Delete file from storage using admin client
     if (document.storage_path) {
