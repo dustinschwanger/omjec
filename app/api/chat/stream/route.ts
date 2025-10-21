@@ -271,6 +271,16 @@ async function getRelevantContext(
       const isDownloadable = chunk.documents?.is_downloadable || metadata?.is_downloadable
       const title = chunk.documents?.title || metadata?.document_title || 'Document'
 
+      // Debug logging
+      console.log('DEBUG - Processing chunk:', {
+        embedding_id: chunk.embedding_id,
+        document_id: chunk.document_id,
+        metadata_download_url: metadata?.download_url,
+        metadata_keys: metadata ? Object.keys(metadata) : [],
+        isDownloadable,
+        title
+      })
+
       // Use download URL from Pinecone metadata (this is the correct, actual URL)
       let downloadUrl = metadata?.download_url
 
@@ -278,7 +288,10 @@ async function getRelevantContext(
       if (isDownloadable && !downloadUrl && chunk.document_id) {
         const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '')
         downloadUrl = `${baseUrl}/api/documents/download/${chunk.document_id}`
+        console.log('DEBUG - Generated fallback URL:', downloadUrl)
       }
+
+      console.log('DEBUG - Final downloadUrl:', downloadUrl)
 
       // Build context string
       let contextStr = `[${title}]`
