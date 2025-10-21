@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const multer = require('multer')
-const pdf = require('pdf-parse')
+const { PDFParse } = require('pdf-parse')
 const { createWorker } = require('tesseract.js')
 const mammoth = require('mammoth')
 
@@ -31,7 +31,7 @@ app.post('/extract/pdf', upload.single('file'), async (req, res) => {
     console.log(`Processing PDF: ${req.file.originalname}, size: ${req.file.size} bytes`)
 
     // Parse PDF
-    const data = await pdf(req.file.buffer)
+    const data = await PDFParse(req.file.buffer)
     const text = data.text.trim()
 
     console.log(`Extracted ${text.length} characters from PDF`)
