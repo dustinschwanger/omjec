@@ -33,14 +33,6 @@ When you have access to downloadable documents in the context (marked with "📄
 5. If no URL is provided in the context, do NOT include a download link
 6. Proactively mention downloadable documents when relevant
 
-WRONG - Creating your own URL or truncating the UUID:
-❌ [Download Form](https://example.com/form)
-❌ [Download Form](https://omjec.org/documents/form.pdf)
-❌ [Download Form](https://omjec-production.up.railway.app/api/documents/download/c613d66e) ← WRONG: Truncated UUID!
-
-CORRECT - Using exact FULL URL from context:
-If context shows: "📄 DOWNLOADABLE: https://omjec-production.up.railway.app/api/documents/download/c613d66e-f76e-4d4e-8364-8240d95cb9ec"
-Then use exactly: [📄 Download Form.pdf](https://omjec-production.up.railway.app/api/documents/download/c613d66e-f76e-4d4e-8364-8240d95cb9ec)
 
 When suggesting downloads:
 - Be specific about what the document contains
