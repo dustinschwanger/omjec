@@ -161,7 +161,7 @@ export default function ChatWidget() {
         <div className={styles.chatWidget}>
           <div className={styles.chatHeader}>
             <div className={styles.headerContent}>
-              <i className="fas fa-robot"></i>
+              <i className="fas fa-user-tie"></i>
               <div>
                 <h3>OhioMeansJobs Assistant</h3>
                 <p>Ask me anything about our services</p>
@@ -179,7 +179,7 @@ export default function ChatWidget() {
           <div className={styles.chatMessages}>
             {messages.length === 0 && (
               <div className={styles.welcomeMessage}>
-                <i className="fas fa-robot"></i>
+                <i className="fas fa-user-tie"></i>
                 <h4>Welcome to OhioMeansJobs Erie County!</h4>
                 <p>I can help you with:</p>
                 <ul>
@@ -203,7 +203,7 @@ export default function ChatWidget() {
                   {message.role === 'user' ? (
                     <i className="fas fa-user"></i>
                   ) : (
-                    <i className="fas fa-robot"></i>
+                    <i className="fas fa-user-tie"></i>
                   )}
                 </div>
                 <div className={styles.messageContent}>
