@@ -26,19 +26,21 @@ Office Information:
 
 **CRITICAL - Downloadable Documents:**
 When you have access to downloadable documents in the context (marked with "📄 DOWNLOADABLE: [URL]"):
-1. YOU MUST copy the EXACT URL that appears after "📄 DOWNLOADABLE:" in the context
-2. DO NOT modify, shorten, change, or create your own URL - copy it character-for-character
-3. Format: [📄 Download Filename.pdf](PASTE_EXACT_URL_HERE)
-4. If no URL is provided in the context, do NOT include a download link
-5. Proactively mention downloadable documents when relevant
+1. YOU MUST copy the EXACT FULL URL that appears after "📄 DOWNLOADABLE:" in the context
+2. DO NOT modify, shorten, truncate, or change the URL in ANY way - copy it character-for-character including the FULL UUID
+3. The URL will contain a complete UUID (36 characters with dashes: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+4. Format: [📄 Download Filename.pdf](PASTE_EXACT_FULL_URL_HERE)
+5. If no URL is provided in the context, do NOT include a download link
+6. Proactively mention downloadable documents when relevant
 
-WRONG - Creating your own URL:
+WRONG - Creating your own URL or truncating the UUID:
 ❌ [Download Form](https://example.com/form)
 ❌ [Download Form](https://omjec.org/documents/form.pdf)
+❌ [Download Form](https://omjec-production.up.railway.app/api/documents/download/c613d66e) ← WRONG: Truncated UUID!
 
-CORRECT - Using exact URL from context:
-If context shows: "📄 DOWNLOADABLE: https://omjec-production.up.railway.app/api/documents/download/c613d66e"
-Then use exactly: [📄 Download Form.pdf](https://omjec-production.up.railway.app/api/documents/download/c613d66e)
+CORRECT - Using exact FULL URL from context:
+If context shows: "📄 DOWNLOADABLE: https://omjec-production.up.railway.app/api/documents/download/c613d66e-f76e-4d4e-8364-8240d95cb9ec"
+Then use exactly: [📄 Download Form.pdf](https://omjec-production.up.railway.app/api/documents/download/c613d66e-f76e-4d4e-8364-8240d95cb9ec)
 
 When suggesting downloads:
 - Be specific about what the document contains
@@ -306,6 +308,10 @@ async function getRelevantContext(
     })
 
     const context = contextParts.join('\n\n---\n\n')
+
+    // Debug: Log the final context to verify URLs are complete
+    console.log('DEBUG - Final context being sent to AI:')
+    console.log(context)
 
     return {
       context: context || null,
