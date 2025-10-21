@@ -51,6 +51,7 @@ CREATE TABLE documents (
   file_size INTEGER,
   storage_path TEXT,
   public_url TEXT,
+  is_downloadable BOOLEAN DEFAULT TRUE,
   metadata JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -76,6 +77,15 @@ CREATE TABLE admin_users (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Document downloads tracking
+CREATE TABLE document_downloads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  download_count INTEGER DEFAULT 1,
+  last_downloaded_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================
 -- INDEXES
 -- ============================================
@@ -84,8 +94,11 @@ CREATE INDEX idx_chat_messages_session_id ON chat_messages(session_id);
 CREATE INDEX idx_chat_messages_created_at ON chat_messages(created_at DESC);
 CREATE INDEX idx_document_chunks_document_id ON document_chunks(document_id);
 CREATE INDEX idx_documents_status ON documents(status);
+CREATE INDEX idx_documents_downloadable ON documents(is_downloadable) WHERE is_downloadable = true;
 CREATE INDEX idx_chat_analytics_created_at ON chat_analytics(created_at DESC);
 CREATE INDEX idx_chat_sessions_token ON chat_sessions(session_token);
+CREATE UNIQUE INDEX idx_document_downloads_document_id ON document_downloads(document_id);
+CREATE INDEX idx_document_downloads_last_downloaded ON document_downloads(last_downloaded_at DESC);
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -97,6 +110,7 @@ ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_analytics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE document_chunks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE document_downloads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
 -- Public read for processed documents
@@ -136,6 +150,20 @@ CREATE POLICY "Admins can read analytics"
   USING (
     auth.uid() IN (SELECT auth_id FROM admin_users WHERE is_active = true)
   );
+
+-- Public can read download stats
+CREATE POLICY "Public can read download stats"
+  ON document_downloads FOR SELECT
+  USING (true);
+
+-- System can track downloads
+CREATE POLICY "System can track downloads"
+  ON document_downloads FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "System can update download stats"
+  ON document_downloads FOR UPDATE
+  USING (true);
 
 -- Admin-only access for document management
 CREATE POLICY "Admins can manage documents"
