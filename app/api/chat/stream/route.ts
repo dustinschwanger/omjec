@@ -358,7 +358,8 @@ async function getRelevantContext(
       }
 
       const score = match.score || 0
-      if (score < 0.7) {
+      // Lower threshold to 0.5 - scores of 0.5-0.7 are typically good semantic matches
+      if (score < 0.5) {
         log('Filtered out low relevance chunk:', chunk.embedding_id, 'score:', score)
         continue
       }
