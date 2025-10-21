@@ -86,6 +86,7 @@ export function chunkText(
   const chunks: DocumentChunk[] = []
   let startIndex = 0
   let chunkIndex = 0
+  let lastEndIndex = 0
 
   while (startIndex < text.length) {
     // Determine chunk end position
@@ -112,11 +113,18 @@ export function chunkText(
       })
     }
 
-    // Move to next chunk with overlap
-    startIndex = endIndex - opts.overlap
+    // Ensure we're making progress
+    if (endIndex <= lastEndIndex) {
+      // Avoid infinite loop if we're stuck
+      break
+    }
+    lastEndIndex = endIndex
 
-    // Ensure we make progress if overlap is too large
-    if (startIndex <= chunks[chunks.length - 1]?.chunkIndex || startIndex >= text.length) {
+    // Move to next chunk with overlap
+    startIndex = Math.max(endIndex - opts.overlap, lastEndIndex)
+
+    // If we've reached the end, break
+    if (startIndex >= text.length) {
       break
     }
   }
