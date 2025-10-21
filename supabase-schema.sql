@@ -63,6 +63,7 @@ CREATE TABLE document_chunks (
   content TEXT NOT NULL,
   chunk_index INTEGER NOT NULL,
   embedding_id TEXT,
+  metadata JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
