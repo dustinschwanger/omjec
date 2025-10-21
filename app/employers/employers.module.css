@@ -172,6 +172,103 @@
   color: var(--text-light);
 }
 
+/* Resources Section */
+.resourcesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.resourceCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.resourceCard h3 {
+  color: var(--ohio-blue);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.resourceCard h3 i {
+  color: var(--ohio-red);
+}
+
+.resourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.resourceItem {
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.resourceItem i {
+  color: var(--ohio-blue);
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.resourceItem a {
+  font-weight: 600;
+  color: var(--ohio-blue);
+  text-decoration: underline;
+}
+
+.resourceItem p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin: 0.5rem 0 0 0;
+}
+
+.resourceItem p i {
+  color: var(--ohio-red);
+}
+
+.resourceItem p a {
+  font-weight: 600;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.linkList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.linkList li i {
+  color: var(--ohio-red);
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.linkList li a {
+  font-weight: 600;
+  color: var(--ohio-blue);
+}
+
 /* CTA Section */
 .ctaSection {
   padding: 80px 0;
@@ -185,6 +282,10 @@
   }
 
   .grantsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .resourcesGrid {
     grid-template-columns: 1fr;
   }
 }

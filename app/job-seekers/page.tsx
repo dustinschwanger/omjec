@@ -135,36 +135,21 @@ export default function JobSeekersPage() {
         </div>
       </section>
 
-      {/* We Serve All Job Seekers */}
-      <section className={styles.serveSection}>
+      {/* CTA Section */}
+      <section className={styles.ctaSection}>
         <div className="container">
-          <h2 className={styles.sectionTitle}>We Serve All Job Seekers</h2>
-          <p className={styles.sectionSubtitle}>Specialized support for diverse backgrounds and circumstances</p>
-
-          <div className={styles.pillContainer}>
-            <div className={styles.pill}>
-              <i className="fas fa-briefcase"></i>
-              <span>First-Time Job Seekers</span>
-            </div>
-            <div className={styles.pill}>
-              <i className="fas fa-history"></i>
-              <span>Employment Gaps</span>
-            </div>
-            <div className={styles.pill}>
-              <i className="fas fa-gavel"></i>
-              <span>Criminal Background</span>
-            </div>
-            <div className={styles.pill}>
-              <i className="fas fa-flag-usa"></i>
-              <span>Veterans & Military Spouses</span>
-            </div>
-            <div className={styles.pill}>
-              <i className="fas fa-wheelchair"></i>
-              <span>Disabilities</span>
-            </div>
-            <div className={styles.pill}>
-              <i className="fas fa-user-graduate"></i>
-              <span>Career Changes</span>
+          <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto' }}>
+            <h2 className={styles.sectionTitle}>Ready to Get Started?</h2>
+            <p style={{ fontSize: '1.125rem', marginBottom: '2rem' }}>
+              Visit our Resource Room to access job search tools, or contact us to schedule an appointment with a career counselor.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a href="https://ohiomeansjobs.com" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                <i className="fas fa-search"></i> Search Jobs on OhioMeansJobs.com
+              </a>
+              <Link href="/contact" className="btn btn-secondary">
+                <i className="fas fa-calendar-alt"></i> Schedule an Appointment
+              </Link>
             </div>
           </div>
         </div>
@@ -338,15 +323,41 @@ export default function JobSeekersPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className={styles.ctaSection}>
+      {/* We Serve All Job Seekers */}
+      <section className={styles.serveSection}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto' }}>
-            <h2 className={styles.sectionTitle}>Ready to Get Started?</h2>
-            <p style={{ fontSize: '1.125rem', marginBottom: '2rem' }}>
-              Visit our Resource Room to access job search tools, or contact us to schedule an appointment with a career counselor.
-            </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <h2 className={styles.sectionTitle}>We Serve All Job Seekers</h2>
+            <p className={styles.sectionSubtitle}>Specialized support for diverse backgrounds and circumstances</p>
+
+            <div className={styles.pillContainer}>
+              <div className={styles.pill}>
+                <i className="fas fa-briefcase"></i>
+                <span>First-Time Job Seekers</span>
+              </div>
+              <div className={styles.pill}>
+                <i className="fas fa-history"></i>
+                <span>Employment Gaps</span>
+              </div>
+              <div className={styles.pill}>
+                <i className="fas fa-gavel"></i>
+                <span>Criminal Background</span>
+              </div>
+              <div className={styles.pill}>
+                <i className="fas fa-flag-usa"></i>
+                <span>Veterans & Military Spouses</span>
+              </div>
+              <div className={styles.pill}>
+                <i className="fas fa-wheelchair"></i>
+                <span>Disabilities</span>
+              </div>
+              <div className={styles.pill}>
+                <i className="fas fa-user-graduate"></i>
+                <span>Career Changes</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '2rem' }}>
               <a href="https://ohiomeansjobs.com" target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                 <i className="fas fa-search"></i> Search Jobs on OhioMeansJobs.com
               </a>
@@ -357,6 +368,7 @@ export default function JobSeekersPage() {
           </div>
         </div>
       </section>
+
     </>
   )
 }

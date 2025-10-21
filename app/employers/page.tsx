@@ -246,6 +246,90 @@ export default function EmployersPage() {
         </div>
       </section>
 
+      {/* Employer Resources */}
+      <section className={styles.servicesSection}>
+        <div className="container">
+          <h2 className={styles.sectionTitle}>Employer Resources</h2>
+          <p className={styles.sectionSubtitle}>Forms, grants, and helpful information for Erie County employers</p>
+
+          <div className={styles.resourcesGrid} style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            {/* Employer Forms */}
+            <div className={styles.resourceCard}>
+              <h3 style={{ fontWeight: 'bold' }}><i className="fas fa-file-alt"></i> Employer Forms</h3>
+              <div className={styles.resourceList}>
+                <div className={styles.resourceItem}>
+                  <i className="fas fa-file-download"></i>
+                  <div>
+                    <a href="/OhioMeansJobs Posting Form.doc" download>OhioMeansJobs Posting Form</a>
+                  </div>
+                </div>
+                <div className={styles.resourceItem}>
+                  <i className="fas fa-file-download"></i>
+                  <div>
+                    <a href="/OJT-Employer-Information-1.pdf" download>OJT Employer Information</a>
+                  </div>
+                </div>
+                <div className={styles.resourceItem}>
+                  <i className="fas fa-file-download"></i>
+                  <div>
+                    <a href="/On-the-Job Training Agreement OhioMeansJobs Erie County Copy.docx" download>On-the-Job Training Agreement</a>
+                  </div>
+                </div>
+                <div className={styles.resourceItem}>
+                  <i className="fas fa-file-download"></i>
+                  <div>
+                    <a href="/OJT_Invoice.pdf" download>OJT Invoice</a>
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '1rem', fontStyle: 'italic' }}>
+                Employers can bring completed forms to our office or email them to:{' '}
+                <a href="mailto:OMJ-ErieCo@jfs.ohio.gov">OMJ-ErieCo@jfs.ohio.gov</a>
+              </p>
+            </div>
+
+            {/* Employer Grants & Other Documents */}
+            <div className={styles.resourceCard}>
+              <h3 style={{ fontWeight: 'bold' }}><i className="fas fa-dollar-sign"></i> Employer Grants & Other Documents</h3>
+              <ul className={styles.linkList}>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/OJT.pdf" download>OJT-On-the-job Training</a>
+                </li>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/Incumbent-Worker-Grant.pdf" download>Incumbent Worker Training</a>
+                </li>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/WIOA-Flyer-2019.pdf" download>WIOA & WIOA Youth – Dislocated workers</a>
+                </li>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/SharedWorkOhio-FAQs.pdf" download>SharedWork Ohio</a>
+                </li>
+                <li>
+                  <i className="fas fa-external-link-alt"></i>
+                  <a href="https://jfs.ohio.gov/owd/employers/NEG.stm" target="_blank" rel="noopener noreferrer">NEG – National Emergency Grants</a>
+                </li>
+                <li>
+                  <i className="fas fa-external-link-alt"></i>
+                  <a href="https://techcred.ohio.gov/" target="_blank" rel="noopener noreferrer">TechCred Program</a>
+                </li>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/JFS-08201-Unemployment-Compensation-Guide-for-Employers.pdf" download>Unemployment: What Employers Should Know</a>
+                </li>
+                <li>
+                  <i className="fas fa-file-pdf"></i>
+                  <a href="/05-21-2020_OMJ-Employer-Deployment-Info_Final.pdf" download>Guidance to updates to the OMJ site</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className={styles.ctaSection}>
         <div className="container">
