@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone', // Good practice in containers
 
   // Temporary: Bypass ESLint during builds (remove after Railway deployment succeeds)
   eslint: {
@@ -32,15 +31,20 @@ const nextConfig = {
   // pdf-parse and canvas have native dependencies that break when bundled
   serverExternalPackages: ['pdf-parse', 'pdfjs-dist', '@napi-rs/canvas'],
 
-  // Belt-and-suspenders: hard externalize so webpack never bundles these
+  // Force webpack to not bundle pdf-parse and its dependencies
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        'pdf-parse': 'commonjs2 pdf-parse',
-        'pdfjs-dist': 'commonjs2 pdfjs-dist',
-        '@napi-rs/canvas': 'commonjs2 @napi-rs/canvas',
-      });
+      // Get existing externals (could be array or function)
+      const existingExternals = config.externals || []
+
+      // Add our packages as externals
+      config.externals = [
+        ...( Array.isArray(existingExternals) ? existingExternals : [existingExternals] ),
+        'pdf-parse',
+        'pdf-parse/node',
+        'pdfjs-dist',
+        '@napi-rs/canvas',
+      ]
     }
     return config;
   },
